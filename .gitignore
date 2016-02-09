@@ -1,0 +1,10 @@
+/target/
+.settings/
+.classpath
+.project
+.cproject
+*.o
+*.obj
+*.lib
+*.so
+*.dll

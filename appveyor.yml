@@ -1,0 +1,58 @@
+version: 2.0.{build}
+
+branches:
+  only:
+    - master
+
+os: MinGW
+
+platform:
+  - x86
+  - x64
+
+configuration:
+  - Debug
+  - Release
+
+install:
+  - ps: |
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      If(!(Test-Path -Path "C:\maven")) {
+        (new-object System.Net.WebClient).DownloadFile(
+          'http://www.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip',
+          'C:\maven-bin.zip'
+        )
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
+      }
+  - cmd: SET PATH=C:\maven\apache-maven-3.3.9\bin;%JAVA_HOME%\bin;%PATH%
+  - cmd: SET MAVEN_OPTS=-Xmx4g
+  - cmd: SET JAVA_OPTS=-Xmx4g
+  - ps: |
+      If($env:PLATFORM -ieq "x86") {
+        $env:PATH="C:\msys64\mingw32\bin;"+$env:path
+        $env:MSYSTEM="MINGW32"
+        $env:ANT_ARCH="x86"
+      } Else {
+        $env:PATH="C:\msys64\mingw64\bin;"+$env:path
+        $env:MSYSTEM="MINGW64"
+        $env:ANT_ARCH="amd64"
+      }
+
+build_script:
+  - ps: |
+      if($env:CONFIGURATION -ne "Debug")
+           { mvn clean install --batch-mode -DskipTest "-Dant.os.arch=$env:ANT_ARCH" }
+      else { mvn clean install --batch-mode -DskipTest "-Dant.os.arch=$env:ANT_ARCH" "-Dant.native.debug=true" }
+
+test_script:
+  - mvn test --batch-mode "-Dant.os.arch=$env:ANT_ARCH"
+
+artifacts:
+  - path: target\*.jar
+    name: Java archive (JAR)
+  - path: '**\*.dll'
+    name: Native library
+
+cache:
+  - C:\maven
+  - C:\Users\appveyor\.m2
