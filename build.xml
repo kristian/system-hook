@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Copyright (c) 2016 Kristian Kraljic
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+
+<project name="system-hook" basedir="." default="compile">
+	<property environment="env" />
+
+	<property name="ant.dir.native" value="${basedir}/src/main/native" />
+	<property name="ant.dir.objects" value="${project.build.directory}/objects" />
+	<property name="ant.dir.library" value="${project.build.directory}/classes/lc/kra/system/lib" />
+	
+	<target name="initialize" description="Initialize local build environment.">
+		<echo>Initializing local environment...</echo>
+		
+		<!-- Ant -->
+		<property name="settings.localRepository" value="${user.home}/.m2/repository" />
+		<taskdef name="cc" classname="net.sf.antcontrib.cpptasks.CCTask">
+			<classpath>
+				<fileset dir="${settings.localRepository}">
+					<include name="ant-contrib/cpptasks/1.0b5/cpptasks-1.0b5.jar"/>
+				</fileset>
+			</classpath>
+		</taskdef>
+		
+		<!-- JNI includes -->
+		<condition property="ant.jni.include" value="${env.JAVA_HOME}/include">
+			<available file="${env.JAVA_HOME}/include" type="dir" />
+		</condition>
+		<condition property="ant.jni.include" value="${java.home}/include">
+			<available file="${java.home}/include" type="dir" />
+		</condition>
+		
+		<fail message="Could not find ant.jni.include folder. Please set your JAVA_HOME environment variable to the root of your JDK directory or manually set the ant.jni.include to the location of the Java JNI header files.">
+			<condition>
+				<not>
+					<or>
+						<isset property="ant.jni.include" />
+						<available file="${ant.jni.include}" type="dir" />
+					</or>
+				</not>
+			</condition>
+		</fail>
+		
+		<!-- OS & OS Arch -->
+		<condition property="ant.os" value="windows">
+			<or>
+				<os family="winnt" />
+				<os family="windows" />
+			</or>
+		</condition>
+		<condition property="ant.os.windows" value="true">
+			<equals arg1="${ant.os}" arg2="windows" />
+		</condition>
+		
+		<condition property="ant.os.arch" value="x86">
+			<or>
+				<os arch="x86" />
+				<os arch="i386" />
+				<os arch="i486" />
+				<os arch="i586" />
+				<os arch="i686" />
+			</or>
+		</condition>
+		<condition property="ant.os.arch" value="amd64">
+			<or>
+				<os arch="amd64" />
+				<os arch="x86-64" />
+				<os arch="x86_64" />
+				<os arch="k8" />
+			</or>
+		</condition>
+		<property name="ant.os.arch" value="${os.arch}" />
+		<condition property="os.arch.x86" value="true">
+			<equals arg1="${os.arch}" arg2="x86" />
+		</condition>
+		<condition property="os.arch.amd64" value="true">
+			<equals arg1="${os.arch}" arg2="amd64" />
+		</condition>
+		
+		<!-- Native Build -->
+		<property name="ant.native.compiler" value="gcc" />
+		<property name="ant.native.linker" value="${ant.native.compiler}" />		
+	</target>
+	
+	<target name="compile" depends="initialize" description="Compiles JNI source files.">
+		<fail message="Property ant.native.library not set. Please set ant.native.library to 'keyboard' or 'mouse'.">
+			<condition>
+				<not>
+					<isset property="ant.native.library" />
+				</not>
+			</condition>
+		</fail>
+		<property name="ant.native.library.result" value="${ant.native.library}hook-${ant.os}-${ant.os.arch}.dll" />
+		
+		<cc objdir="${ant.dir.objects}" outfile="${ant.dir.library}/${ant.native.library.result}" subsystem="console" debug="${ant.native.debug}">
+			<compiler name="${ant.native.compiler}" />
+			<compilerarg value="-std=c99" />
+			
+			<compilerarg value="-O0" unless="${ant.native.debug}" />
+			<compilerarg value="-O2" if="${ant.native.debug}" />
+			<compilerarg value="-g3" unless="${ant.native.debug}" />
+				
+			<compilerarg value="-Wall" />
+			<compilerarg value="-Wextra" />
+			<compilerarg value="-Wno-unused-parameter" />
+			
+			<compilerarg value="-D_JNI_IMPLEMENTATION_" />
+			
+			<includepath path="${ant.jni.include}" />
+			<includepath path="${ant.jni.include}/win32" if="ant.os.windows" />
+			
+			<defineset>
+				<define name="DEBUG" if="ant.native.debug" />
+			</defineset>
+			
+			<linker name="${ant.native.linker}" />
+			<linkerarg value="-shared" />
+			<linkerarg value="-static" if="ant.os.windows" />
+			
+			<fileset dir="${ant.dir.native}/${ant.native.library}/${ant.os}">
+				<include name="**/*.c" />
+			</fileset>
+		</cc>
+	</target>
+</project>
