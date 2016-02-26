@@ -90,9 +90,9 @@ public class GlobalKeyboardHook {
 			/**
 			 * Handle the input virtualKeyCode and transitionState, create event and add it to the inputBuffer
 			 */
-			@Override public void handleKey(int virtualKeyCode, int transitionState) {
+			@Override public void handleKey(int virtualKeyCode, int transitionState, char keyChar) {
 				switchControlKeys(virtualKeyCode, transitionState);
-				inputBuffer.add(new GlobalKeyEvent(this, virtualKeyCode, transitionState, menuPressed, shiftPressed, controlPressed, extendedKey));			
+				inputBuffer.add(new GlobalKeyEvent(this, virtualKeyCode, transitionState, keyChar, menuPressed, shiftPressed, controlPressed, extendedKey));			
 			}
 		};
 		
@@ -179,7 +179,7 @@ public class GlobalKeyboardHook {
 		public native final int registerHook();
 		public native final void unregisterHook();
 		
-		public abstract void handleKey(int virtualKeyCode, int transitionState);
+		public abstract void handleKey(int virtualKeyCode, int transitionState, char keyChar);
 	}
 	
 	/**

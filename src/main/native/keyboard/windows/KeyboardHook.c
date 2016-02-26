@@ -42,6 +42,9 @@ jmethodID handleKeyMeth = NULL;
 
 DWORD hookThreadId = 0;
 
+BYTE keyState[256];
+WCHAR buffer[2];
+
 BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved)  {
 	switch(reason) {
 		case DLL_PROCESS_ATTACH:
@@ -58,12 +61,14 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)  
 	JNIEnv* env; KBDLLHOOKSTRUCT* pStruct = (KBDLLHOOKSTRUCT*)lParam;
 	if((*jvm)->AttachCurrentThread(jvm, (void**)&env, NULL)>=JNI_OK) {
 		jboolean tState = (jboolean)FALSE;
-		switch(wParam)  {
+		GetKeyboardState((PBYTE)&keyState);
+		ToUnicode(pStruct->vkCode, pStruct->scanCode, (PBYTE)&keyState, (LPWSTR)&buffer, sizeof(buffer)/2, 0);
+		switch(wParam) {
 			case WM_KEYDOWN: case WM_SYSKEYDOWN:
 				tState = (jboolean)TRUE;
 				/* no break */
 			case WM_KEYUP: case WM_SYSKEYUP:
-				(*env)->CallVoidMethod(env, keyboardHookObj, handleKeyMeth, pStruct->vkCode, tState);
+				(*env)->CallVoidMethod(env, keyboardHookObj, handleKeyMeth, pStruct->vkCode, tState, (jchar)buffer[0]);
 				break;
 			default: break;
 		}
@@ -93,7 +98,7 @@ JNIEXPORT jint JNICALL Java_lc_kra_system_keyboard_GlobalKeyboardHook_00024Nativ
 
 	keyboardHookObj = (*env)->NewGlobalRef(env, thisObj);
 	jclass keyboardHookCls = (*env)->GetObjectClass(env, keyboardHookObj);
-	handleKeyMeth = (*env)->GetMethodID(env, keyboardHookCls, "handleKey", "(II)V");
+	handleKeyMeth = (*env)->GetMethodID(env, keyboardHookCls, "handleKey", "(IIC)V");
 	if(handleKeyMeth==0) {
 		(*env)->ExceptionClear(env);
 		DEBUG_PRINT(("NATIVE: registerHook - No handle method!\n"));

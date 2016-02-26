@@ -213,16 +213,18 @@ public class GlobalKeyEvent extends EventObject {
 		VK_OEM_CLEAR = 0xFE; //Clear key
 
 	private int virtualKeyCode, transitionState;
+	private char keyChar;
 	private boolean
 		menuPressed,
 		shiftPressed,
 		controlPressed,
 		extendedKey;
 
-	public GlobalKeyEvent(Object source, int virtualKeyCode, int transitionState, boolean menuPressed, boolean shiftPressed, boolean controlPressed, boolean extendedKey) {
+	public GlobalKeyEvent(Object source, int virtualKeyCode, int transitionState, char keyChar, boolean menuPressed, boolean shiftPressed, boolean controlPressed, boolean extendedKey) {
 		super(source);
 		this.virtualKeyCode = virtualKeyCode;
 		this.transitionState = transitionState;
+		this.keyChar = keyChar;
 		this.menuPressed = menuPressed;
 		this.shiftPressed = shiftPressed;
 		this.controlPressed = controlPressed;
@@ -235,6 +237,12 @@ public class GlobalKeyEvent extends EventObject {
 	 * @return the integer code for an actual key on the keyboard.
 	 */
 	public int getVirtualKeyCode() { return virtualKeyCode; }
+	/**
+	 * Returns the unicode keyChar of this key event.
+	 * 
+	 * @return the unicode value of the actual key on the keyboard.
+	 */
+	public char getKeyChar() { return keyChar; }
 	/**
 	 * Returns the transition state (up or down) for this key event.
 	 * 
@@ -267,7 +275,8 @@ public class GlobalKeyEvent extends EventObject {
      * @return  A a String representation of this GlobalKeyEvent.
      */
 	@Override public String toString() {
-		StringBuilder builder = new StringBuilder().append(virtualKeyCode).append(" [").append(transitionState==TS_DOWN?"down":"up");
+		StringBuilder builder = new StringBuilder().append(virtualKeyCode);
+		builder.append(" [").append(transitionState==TS_DOWN?"down":"up");
 		if(menuPressed) builder.append(",menu");
 		if(shiftPressed) builder.append(",shift");
 		if(controlPressed) builder.append(",control");
