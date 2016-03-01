@@ -36,6 +36,17 @@
 extern "C"
 #endif
 
+static inline void debugPrintLastError(TCHAR *szErrorText) {
+	DWORD dw = GetLastError();
+
+	void *pMsgBuf;
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (TCHAR*)&pMsgBuf, 0, NULL);
+	DEBUG_PRINT(("%s with error %ld: %s\n", szErrorText, dw, (TCHAR*)pMsgBuf));
+
+	LocalFree(pMsgBuf);
+}
+
 HINSTANCE hInst = NULL;
 
 JavaVM * jvm = NULL;
@@ -130,7 +141,7 @@ JNIEXPORT jint JNICALL Java_lc_kra_system_mouse_GlobalMouseHook_00024NativeMouse
 
 	HHOOK hookHandle = SetWindowsHookEx(WH_MOUSE_LL,LowLevelMouseProc,hInst,0);
 	if(hookHandle==NULL) {
-		DEBUG_PRINT(("NATIVE: registerHook - Hook failed!\n"));
+		debugPrintLastError("NATIVE: registerHook - Hook failed");
 		return (jint)E_HOOK_FAILED;
 	} else DEBUG_PRINT(("NATIVE: registerHook - Hook success\n"));
 
@@ -151,7 +162,7 @@ JNIEXPORT jint JNICALL Java_lc_kra_system_mouse_GlobalMouseHook_00024NativeMouse
 		DEBUG_PRINT(("NATIVE: registerHook - Unhook success\n"));
 		return (jint)E_SUCCESS;
 	} else {
-		DEBUG_PRINT(("NATIVE: registerHook - Unhook failed!\n"));
+		debugPrintLastError("NATIVE: registerHook - Unhook failed!");
 		return (jint)E_UNHOOK_FAILED;
 	}
 }
