@@ -89,7 +89,7 @@ You can include `system-hook` from this GitHub repository by adding this depende
 <dependency>
   <groupId>lc.kra.system</groupId>
   <artifactId>system-hook</artifactId>
-  <version>2.1</version>
+  <version>2.2</version>
 </dependency>
 ```
 
