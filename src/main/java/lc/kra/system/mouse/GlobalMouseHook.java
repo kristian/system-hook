@@ -28,8 +28,8 @@ import static lc.kra.system.mouse.event.GlobalMouseEvent.TS_UP;
 import static lc.kra.system.mouse.event.GlobalMouseEvent.TS_WHEEL;
 
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import lc.kra.system.LibraryLoader;
@@ -45,7 +45,7 @@ public class GlobalMouseHook {
 		new LinkedBlockingQueue<GlobalMouseEvent>();
 	private boolean libraryLoad; int buttons = BUTTON_NO;
 	
-	private List<GlobalMouseListener> listeners = new Vector<GlobalMouseListener>();
+	private List<GlobalMouseListener> listeners = new CopyOnWriteArrayList<GlobalMouseListener>();
 	private Thread eventDispatcher = new Thread() {{
 			setName("Global Mouse Hook Dispatcher");
 			setDaemon(true);
@@ -58,10 +58,10 @@ public class GlobalMouseHook {
 					GlobalMouseEvent event = inputBuffer.take();
 					switch(event.getTransitionState()) {
 					case TS_UP:
-						mousePressed(event);
+						mouseReleased(event);
 						break;
 					case TS_DOWN:
-						mouseReleased(event);
+						mousePressed(event);
 						break;
 					case TS_MOVE:
 						mouseMoved(event);

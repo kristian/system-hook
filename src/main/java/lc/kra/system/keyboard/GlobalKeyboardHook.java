@@ -34,8 +34,8 @@ import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RWIN;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_SHIFT;
 
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import lc.kra.system.LibraryLoader;
@@ -51,7 +51,7 @@ public class GlobalKeyboardHook {
 		new LinkedBlockingQueue<GlobalKeyEvent>();
 	private boolean libraryLoad, menuPressed, shiftPressed, controlPressed, extendedKey;
 	
-	private List<GlobalKeyListener> listeners = new Vector<GlobalKeyListener>();
+	private List<GlobalKeyListener> listeners = new CopyOnWriteArrayList<GlobalKeyListener>();
 	private Thread eventDispatcher = new Thread() {{
 			setName("Global Keyboard Hook Dispatcher");
 			setDaemon(true);
