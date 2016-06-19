@@ -71,9 +71,20 @@ BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved)  {
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)  {
 	JNIEnv* env; KBDLLHOOKSTRUCT* pStruct = (KBDLLHOOKSTRUCT*)lParam;
 	if((*jvm)->AttachCurrentThread(jvm, (void**)&env, NULL)>=JNI_OK) {
-		jboolean tState = (jboolean)FALSE;
 		GetKeyboardState((PBYTE)&keyState);
-		ToUnicode(pStruct->vkCode, pStruct->scanCode, (PBYTE)&keyState, (LPWSTR)&buffer, sizeof(buffer)/2, 0);
+
+		// As ToUnicode/ToAscii is messing up dead keys (e.g. ^, `, ...), we have to check the MSB of the MapVirtualKey return value first.
+		// (see Stack Overflow at http://stackoverflow.com/questions/1964614/toascii-tounicode-in-a-keyboard-hook-destroys-dead-keys)
+		if(!(MapVirtualKey(pStruct->vkCode, MAPVK_VK_TO_CHAR)>>(sizeof(UINT)*8-1) & 1)) {
+			switch(ToUnicode(pStruct->vkCode, pStruct->scanCode, (PBYTE)&keyState, (LPWSTR)&buffer, sizeof(buffer)/2, 0)) {
+				case -1:
+					DEBUG_PRINT(("NATIVE: LowLevelKeyboardProc - Wrong dead key mapping.\n"));
+					break;
+				default: break;
+			}
+		} else buffer[0] = '\0';
+
+		jboolean tState = (jboolean)FALSE;
 		switch(wParam) {
 			case WM_KEYDOWN: case WM_SYSKEYDOWN:
 				tState = (jboolean)TRUE;
