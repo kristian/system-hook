@@ -136,6 +136,7 @@ SOFTWARE.
 			<linker name="${ant.native.linker}" />
 			<linkerarg value="-shared" />
 			<linkerarg value="-static" if="ant.os.windows" />
+			<linkerarg value="-add-stdcall-alias" if="ant.os.windows" />
 			
 			<fileset dir="${ant.dir.native}/${ant.native.library}/${ant.os}">
 				<include name="**/*.c" />

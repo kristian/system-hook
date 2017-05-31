@@ -95,7 +95,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)  {
 					break;
 				case WM_MOUSEMOVE:
 					tState = (jint)TS_MOVE;
-					if(xPos!=xPosOld||yPos!=yPos)
+					if(xPos!=xPosOld||yPos!=yPosOld)
 						(*env)->CallVoidMethod(env, mouseHookObj, handleMouseMeth, tState, (jint)0, /*(jint)wParam,*/xPosOld=xPos, yPosOld=yPos, (jint)0);
 					break;
 				case WM_MOUSEWHEEL:

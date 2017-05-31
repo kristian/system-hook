@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>lc.kra.system</groupId>
 	<artifactId>system-hook</artifactId>
-	<version>2.5</version>
+	<version>2.6</version>
 	<description>Global Keyboard / Mouse Hook for Java applications.</description>
 	<url>https://github.com/kristian/system-hook</url>
 
