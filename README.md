@@ -6,6 +6,8 @@ The *Java (low-level) System Hook* comes bundled with native libraries (for Wind
 
 Using the `GlobalKeyboardHook` class a `GlobalKeyListener` or the adapter class `GlobalKeyAdapter` can be registered to listen to `keyPressed` and `keyReleased` events like so:
 ```java
+import java.util.Map.Entry;
+
 import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
@@ -14,9 +16,12 @@ public class GlobalKeyboardExample {
 	private static boolean run = true;
 	public static void main(String[] args) {
 		// might throw a UnsatisfiedLinkError if the native library fails to load or a RuntimeException if hooking fails 
-		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook();
+		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true); // use false here to switch to hook instead of raw input
 
-		System.out.println("Global keyboard hook successfully started, press [escape] key to shutdown.");
+		System.out.println("Global keyboard hook successfully started, press [escape] key to shutdown. Connected keyboards:");
+		for(Entry<Long,String> keyboard:GlobalKeyboardHook.listKeybords().entrySet())
+			System.out.format("%d: %s\n", keyboard.getKey(), keyboard.getValue());
+		
 		keyboardHook.addKeyListener(new GlobalKeyAdapter() {
 			@Override public void keyPressed(GlobalKeyEvent event) {
 				System.out.println(event);
@@ -37,6 +42,8 @@ public class GlobalKeyboardExample {
 
 Using the `GlobalMouseHook` class a `GlobalMouseListener` or the adapter class `GlobalMouseAdapter` can be registered to listen to `mousePressed`, `mouseReleased`, `mouseMoved` and `mouseWheel` events like so:
 ```java
+import java.util.Map.Entry;
+
 import lc.kra.system.mouse.GlobalMouseHook;
 import lc.kra.system.mouse.event.GlobalMouseAdapter;
 import lc.kra.system.mouse.event.GlobalMouseEvent;
@@ -45,9 +52,12 @@ public class GlobalMouseExample {
 	private static boolean run = true;
 	public static void main(String[] args) {
 		// might throw a UnsatisfiedLinkError if the native library fails to load or a RuntimeException if hooking fails 
-		GlobalMouseHook mouseHook = new GlobalMouseHook();
+		GlobalMouseHook mouseHook = new GlobalMouseHook(); // add true to the constructor, to switch to raw input mode
 
-		System.out.println("Global mouse hook successfully started, press [middle] mouse button to shutdown.");
+		System.out.println("Global mouse hook successfully started, press [middle] mouse button to shutdown. Connected mice:");
+		for(Entry<Long,String> mouse:GlobalMouseHook.listMice().entrySet())
+			System.out.format("%d: %s\n", mouse.getKey(), mouse.getValue());
+		
 		mouseHook.addMouseListener(new GlobalMouseAdapter() {
 			@Override public void mousePressed(GlobalMouseEvent event)  {
 				System.out.println(event);
