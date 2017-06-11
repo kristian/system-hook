@@ -170,7 +170,7 @@ public class GlobalKeyboardHook {
 	 * 
 	 * @return A map of device handles and display names
 	 */
-	public static Map<Long,String> listKeybords() throws UnsatisfiedLinkError {
+	public static Map<Long,String> listKeyboards() throws UnsatisfiedLinkError {
 		LibraryLoader.loadLibrary(); // load the library, in case it's not already loaded
 		return NativeKeyboardHook.listDevices();
 	}

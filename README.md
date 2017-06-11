@@ -19,7 +19,7 @@ public class GlobalKeyboardExample {
 		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true); // use false here to switch to hook instead of raw input
 
 		System.out.println("Global keyboard hook successfully started, press [escape] key to shutdown. Connected keyboards:");
-		for(Entry<Long,String> keyboard:GlobalKeyboardHook.listKeybords().entrySet())
+		for(Entry<Long,String> keyboard:GlobalKeyboardHook.listKeyboards().entrySet())
 			System.out.format("%d: %s\n", keyboard.getKey(), keyboard.getValue());
 		
 		keyboardHook.addKeyListener(new GlobalKeyAdapter() {
@@ -99,7 +99,7 @@ You can include `system-hook` from this GitHub repository by adding this depende
 <dependency>
   <groupId>lc.kra.system</groupId>
   <artifactId>system-hook</artifactId>
-  <version>3.0</version>
+  <version>3.1</version>
 </dependency>
 ```
 

@@ -34,7 +34,7 @@ public class GlobalKeyboardExample {
 		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true); // use false here to switch to hook instead of raw input
 
 		System.out.println("Global keyboard hook successfully started, press [escape] key to shutdown. Connected keyboards:");
-		for(Entry<Long,String> keyboard:GlobalKeyboardHook.listKeybords().entrySet())
+		for(Entry<Long,String> keyboard:GlobalKeyboardHook.listKeyboards().entrySet())
 			System.out.format("%d: %s\n", keyboard.getKey(), keyboard.getValue());
 		
 		keyboardHook.addKeyListener(new GlobalKeyAdapter() {
