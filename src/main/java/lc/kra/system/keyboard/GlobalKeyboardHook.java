@@ -34,6 +34,7 @@ import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RWIN;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_SHIFT;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -49,7 +50,7 @@ public class GlobalKeyboardHook {
 	
 	private BlockingQueue<GlobalKeyEvent> inputBuffer =
 		new LinkedBlockingQueue<GlobalKeyEvent>();
-	private boolean libraryLoad, menuPressed, shiftPressed, controlPressed, extendedKey;
+	private boolean menuPressed, shiftPressed, controlPressed, extendedKey;
 	
 	private List<GlobalKeyListener> listeners = new CopyOnWriteArrayList<GlobalKeyListener>();
 	private Thread eventDispatcher = new Thread() {{
@@ -69,7 +70,7 @@ public class GlobalKeyboardHook {
 			} catch(InterruptedException e) { /* thread got interrupted, break */ }
 		}
 	};
-	
+
 	/**
 	 * Instantiate a new GlobalKeyboardHook.
 	 * 
@@ -82,17 +83,28 @@ public class GlobalKeyboardHook {
 	 * @throws UnsatisfiedLinkError Thrown if loading the native library failed
 	 * @throws RuntimeException Thrown if registering the low-level keyboard hook failed
 	 */
-	public GlobalKeyboardHook() throws UnsatisfiedLinkError {
-		if(!libraryLoad) { LibraryLoader.loadLibrary("keyboardhook"); libraryLoad = true; }
+	public GlobalKeyboardHook() throws UnsatisfiedLinkError { this(false); }
+	
+	/**
+	 * Instantiate a new GlobalKeyboardHook.
+	 * 
+	 * @see #GlobalKeyboardHook()
+	 * 
+	 * @param raw Use raw input, instead of a low-level system hook. Raw input will provide additional information of the device
+	 * @throws UnsatisfiedLinkError Thrown if loading the native library failed
+	 * @throws RuntimeException Thrown if registering the low-level keyboard hook failed
+	 */
+	public GlobalKeyboardHook(boolean raw) throws UnsatisfiedLinkError {
+		LibraryLoader.loadLibrary(); // load the library, in case it's not already loaded
 		
 		// register a keyboard hook (throws a RuntimeException in case something goes wrong)
-		keyboardHook = new NativeKeyboardHook() {
+		keyboardHook = new NativeKeyboardHook(raw) {
 			/**
 			 * Handle the input virtualKeyCode and transitionState, create event and add it to the inputBuffer
 			 */
-			@Override public void handleKey(int virtualKeyCode, int transitionState, char keyChar) {
+			@Override public void handleKey(int virtualKeyCode, int transitionState, char keyChar, long deviceHandle) {
 				switchControlKeys(virtualKeyCode, transitionState);
-				inputBuffer.add(new GlobalKeyEvent(this, virtualKeyCode, transitionState, keyChar, menuPressed, shiftPressed, controlPressed, extendedKey));			
+				inputBuffer.add(new GlobalKeyEvent(this, virtualKeyCode, transitionState, keyChar, menuPressed, shiftPressed, controlPressed, extendedKey, deviceHandle));			
 			}
 		};
 		
@@ -153,13 +165,25 @@ public class GlobalKeyboardHook {
 		}
 	}
 	
-	private abstract class NativeKeyboardHook extends Thread {
+	/**
+	 * Lists all connected keyboards
+	 * 
+	 * @return A map of device handles and display names
+	 */
+	public static Map<Long,String> listKeybords() throws UnsatisfiedLinkError {
+		LibraryLoader.loadLibrary(); // load the library, in case it's not already loaded
+		return NativeKeyboardHook.listDevices();
+	}
+	
+	private static abstract class NativeKeyboardHook extends Thread {
 		private int status;
+		private boolean raw;
 		
-		public NativeKeyboardHook()  {
+		public NativeKeyboardHook(boolean raw)  {
 			super("Global Keyboard Hook Thread");
 			setDaemon(false); setPriority(MAX_PRIORITY);
 			synchronized(this) {
+				this.raw = raw;
 				try { start(); wait(); }
 				catch (InterruptedException e) {
 					throw new RuntimeException(e);
@@ -171,15 +195,17 @@ public class GlobalKeyboardHook {
 		}
 		
 		@Override public void run() {
-			status = registerHook();
+			status = registerHook(raw);
 			synchronized(this) {
 				notifyAll(); }
 		}
-
-		public native final int registerHook();
+		
+		public native final int registerHook(boolean raw);
 		public native final void unregisterHook();
 		
-		public abstract void handleKey(int virtualKeyCode, int transitionState, char keyChar);
+		public static native final Map<Long,String> listDevices();
+		
+		public abstract void handleKey(int virtualKeyCode, int transitionState, char keyChar, long deviceHandle);
 	}
 	
 	/**

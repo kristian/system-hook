@@ -49,9 +49,10 @@ public class GlobalMouseEvent extends EventObject {
 	public static final int
 		WHEEL_DELTA = 120; //Default wheel delta parameter
 	
-	protected int transitionState, button, buttons, x, y, delta;
+	private int transitionState, button, buttons, x, y, delta;
+	private long deviceHandle;
 
-	public GlobalMouseEvent(Object source, int transitionState, int button, int buttons, int x, int y, int delta) {
+	public GlobalMouseEvent(Object source, int transitionState, int button, int buttons, int x, int y, int delta, long deviceHandle) {
 		super(source);
 		this.transitionState = transitionState;
 		this.button = button;
@@ -59,6 +60,7 @@ public class GlobalMouseEvent extends EventObject {
 		this.x = x;
 		this.y = y;
 		this.delta = delta;
+		this.deviceHandle = deviceHandle;
 	}
 	
 	/**
@@ -113,6 +115,11 @@ public class GlobalMouseEvent extends EventObject {
 	 * @return The relative change (delta) of the mouse wheel movement.
 	 */
 	public int getDelta() { return delta; }
+	
+	/**
+	 * Returns the handle of the mouse the input was received from.
+	 */
+	public long getDeviceHandle() { return deviceHandle; }
 	
     /**
      * Returns a String representation of this GlobalMouseEvent.

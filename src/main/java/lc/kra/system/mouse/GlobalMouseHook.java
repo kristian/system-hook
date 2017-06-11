@@ -28,6 +28,7 @@ import static lc.kra.system.mouse.event.GlobalMouseEvent.TS_UP;
 import static lc.kra.system.mouse.event.GlobalMouseEvent.TS_WHEEL;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,7 +44,7 @@ public class GlobalMouseHook {
 	
 	private BlockingQueue<GlobalMouseEvent> inputBuffer =
 		new LinkedBlockingQueue<GlobalMouseEvent>();
-	private boolean libraryLoad; int buttons = BUTTON_NO;
+	private int buttons = BUTTON_NO;
 	
 	private List<GlobalMouseListener> listeners = new CopyOnWriteArrayList<GlobalMouseListener>();
 	private Thread eventDispatcher = new Thread() {{
@@ -87,16 +88,27 @@ public class GlobalMouseHook {
 	 * @throws UnsatisfiedLinkError Thrown if loading the native library failed
 	 * @throws RuntimeException Thrown if registering the low-level mouse hook failed
 	 */
-	public GlobalMouseHook() throws UnsatisfiedLinkError {
-		if(!libraryLoad) { LibraryLoader.loadLibrary("mousehook"); libraryLoad = true; }
+	public GlobalMouseHook() throws UnsatisfiedLinkError { this(false); }
+	
+	/**
+	 * Instantiate a new GlobalMouseHook.
+	 * 
+	 * @see #GlobalMouseHook()
+	 * 
+	 * @param raw Use raw input, instead of a low-level system hook. Raw input will provide additional information of the device, but only give relative X/Y positions
+	 * @throws UnsatisfiedLinkError Thrown if loading the native library failed
+	 * @throws RuntimeException Thrown if registering the low-level keyboard hook failed
+	 */
+	public GlobalMouseHook(boolean raw) throws UnsatisfiedLinkError {
+		LibraryLoader.loadLibrary(); // load the library, in case it's not already loaded
 		
 		// register a mouse hook (throws a RuntimeException in case something goes wrong)
-		mouseHook = new NativeMouseHook() {
+		mouseHook = new NativeMouseHook(raw) {
 			/**
 			 * Handle the input transitionState create event and add it to the inputBuffer
 			 */
-			@Override public void handleMouse(int transitionState, int button, int x, int y, int delta) {
-				inputBuffer.add(new GlobalMouseEvent(this, transitionState, button, buttons^=button, x, y, delta));			
+			@Override public void handleMouse(int transitionState, int button, int x, int y, int delta, long deviceHandle) {
+				inputBuffer.add(new GlobalMouseEvent(this, transitionState, button, buttons^=button, x, y, delta, deviceHandle));			
 			}
 		};
 		
@@ -175,13 +187,25 @@ public class GlobalMouseHook {
 		}
 	}
 	
-	private abstract class NativeMouseHook extends Thread {
+	/**
+	 * Lists all connected mice
+	 * 
+	 * @return A map of device handles and display names
+	 */
+	public static Map<Long,String> listMice() throws UnsatisfiedLinkError {
+		LibraryLoader.loadLibrary(); // load the library, in case it's not already loaded
+		return NativeMouseHook.listDevices();
+	}
+	
+	private static abstract class NativeMouseHook extends Thread {
 		private int status;
+		private boolean raw;
 		
-		public NativeMouseHook()  {
+		public NativeMouseHook(boolean raw)  {
 			super("Global Mouse Hook Thread");
 			setDaemon(false); setPriority(MAX_PRIORITY);
 			synchronized(this) {
+				this.raw = raw;
 				try { start(); wait(); }
 				catch (InterruptedException e) {
 					throw new RuntimeException(e);
@@ -193,14 +217,16 @@ public class GlobalMouseHook {
 		}
 		
 		@Override public void run() {
-			status = registerHook();
+			status = registerHook(raw);
 			synchronized(this) {
 				notifyAll(); }
 		}
 
-		public native final int registerHook();
+		public native final int registerHook(boolean raw);
 		public native final void unregisterHook();
 		
-		public abstract void handleMouse(int transitionState, int button, int x, int y, int delta);
+		public static native final Map<Long,String> listDevices();
+		
+		public abstract void handleMouse(int transitionState, int button, int x, int y, int delta, long deviceHandle);
 	}
 }

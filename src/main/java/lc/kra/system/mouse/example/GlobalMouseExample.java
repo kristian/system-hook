@@ -21,6 +21,8 @@
  */
 package lc.kra.system.mouse.example;
 
+import java.util.Map.Entry;
+
 import lc.kra.system.mouse.GlobalMouseHook;
 import lc.kra.system.mouse.event.GlobalMouseAdapter;
 import lc.kra.system.mouse.event.GlobalMouseEvent;
@@ -29,9 +31,12 @@ public class GlobalMouseExample {
 	private static boolean run = true;
 	public static void main(String[] args) {
 		// might throw a UnsatisfiedLinkError if the native library fails to load or a RuntimeException if hooking fails 
-		GlobalMouseHook mouseHook = new GlobalMouseHook();
+		GlobalMouseHook mouseHook = new GlobalMouseHook(); // add true to the constructor, to switch to raw input mode
 
-		System.out.println("Global mouse hook successfully started, press [middle] mouse button to shutdown.");
+		System.out.println("Global mouse hook successfully started, press [middle] mouse button to shutdown. Connected mice:");
+		for(Entry<Long,String> mouse:GlobalMouseHook.listMice().entrySet())
+			System.out.format("%d: %s\n", mouse.getKey(), mouse.getValue());
+		
 		mouseHook.addMouseListener(new GlobalMouseAdapter() {
 			@Override public void mousePressed(GlobalMouseEvent event)  {
 				System.out.println(event);

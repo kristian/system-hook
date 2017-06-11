@@ -32,24 +32,30 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 public class LibraryLoader {
+	private static final String LIBRARY_NAME = "systemhook";
+	
+	private static boolean libraryLoad;
+	
 	/**
 	 * Tries to laod the library with the given name
 	 * 
 	 * @param name The name of the library to load
 	 * @throws UnsatisfiedLinkError Thrown in case loading the library fails
 	 */
-	public static void loadLibrary(String name) throws UnsatisfiedLinkError {
-		String libName = System.getProperty(name+".lib.name", System.mapLibraryName(name).replaceAll("\\.jnilib$", "\\.dylib")),
-			libPath = System.getProperty(name+".lib.path");
+	public static synchronized void loadLibrary() throws UnsatisfiedLinkError {
+		if(libraryLoad) return; //library already loaded
+		String libName = System.getProperty(LIBRARY_NAME+".lib.name", System.mapLibraryName(LIBRARY_NAME).replaceAll("\\.jnilib$", "\\.dylib")),
+			libPath = System.getProperty(LIBRARY_NAME+".lib.path");
 		
 		try {
 			if(libPath==null)
 			     System.loadLibrary(libName);
 			else System.load(new File(libPath, libName).getAbsolutePath());
+			libraryLoad = true;
 			return;
 		} catch(UnsatisfiedLinkError e) { /* do nothing, try next */ }
 		
-		libName = System.mapLibraryName(name+'-'+getOperatingSystemName()+'-'+getOperatingSystemArchitecture())
+		libName = System.mapLibraryName(LIBRARY_NAME+'-'+getOperatingSystemName()+'-'+getOperatingSystemArchitecture())
 			.replaceAll("\\.jnilib$", "\\.dylib"); // for JDK < 1.7
 		String libNameExtension = libName.substring(libName.lastIndexOf('.')),
 			libResourcePath = LibraryLoader.class.getPackage().getName().replace('.', '/')+"/lib/"+libName;
@@ -58,7 +64,7 @@ public class LibraryLoader {
 		try {
 			if((inputStream=LibraryLoader.class.getClassLoader().getResourceAsStream(libResourcePath))==null)
 				throw new FileNotFoundException("lib: "+libName+" not found in lib directory");
-			File tempFile = File.createTempFile(name+"-", libNameExtension);
+			File tempFile = File.createTempFile(LIBRARY_NAME+"-", libNameExtension);
 			
 			Checksum checksum = new CRC32();
 			outputStream = new FileOutputStream(tempFile);
@@ -69,12 +75,13 @@ public class LibraryLoader {
 			}
 			outputStream.close();
 			
-			File libFile = new File(tempFile.getParentFile(), name+"+"+checksum.getValue()+libNameExtension);
+			File libFile = new File(tempFile.getParentFile(), LIBRARY_NAME+"+"+checksum.getValue()+libNameExtension);
 			if(!libFile.exists())
 			     tempFile.renameTo(libFile);
 			else tempFile.delete();
 			
 			System.load(libFile.getAbsolutePath());
+			libraryLoad = true;
 		} catch(IOException e) {
 			throw new UnsatisfiedLinkError(e.getMessage());
 		} finally {

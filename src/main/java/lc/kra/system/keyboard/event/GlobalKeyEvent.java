@@ -219,8 +219,9 @@ public class GlobalKeyEvent extends EventObject {
 		shiftPressed,
 		controlPressed,
 		extendedKey;
+	private long deviceHandle;
 
-	public GlobalKeyEvent(Object source, int virtualKeyCode, int transitionState, char keyChar, boolean menuPressed, boolean shiftPressed, boolean controlPressed, boolean extendedKey) {
+	public GlobalKeyEvent(Object source, int virtualKeyCode, int transitionState, char keyChar, boolean menuPressed, boolean shiftPressed, boolean controlPressed, boolean extendedKey, long deviceHandle) {
 		super(source);
 		this.virtualKeyCode = virtualKeyCode;
 		this.transitionState = transitionState;
@@ -229,6 +230,7 @@ public class GlobalKeyEvent extends EventObject {
 		this.shiftPressed = shiftPressed;
 		this.controlPressed = controlPressed;
 		this.extendedKey = extendedKey;
+		this.deviceHandle = deviceHandle;
 	}
 
 	/**
@@ -268,6 +270,11 @@ public class GlobalKeyEvent extends EventObject {
 	 * Returns true if the menu/shift/control key pressed is an extended key.
 	 */
 	public boolean isExtendedKey() { return extendedKey; }
+	
+	/**
+	 * Returns the handle of the keyboard the key was pressed on.
+	 */
+	public long getDeviceHandle() { return deviceHandle; }
 	
     /**
      * Returns a String representation of this GlobalKeyEvent.

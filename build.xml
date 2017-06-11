@@ -103,16 +103,9 @@ SOFTWARE.
 	</target>
 	
 	<target name="compile" depends="initialize" description="Compiles JNI source files.">
-		<fail message="Property ant.native.library not set. Please set ant.native.library to 'keyboard' or 'mouse'.">
-			<condition>
-				<not>
-					<isset property="ant.native.library" />
-				</not>
-			</condition>
-		</fail>
-		<property name="ant.native.library.result" value="${ant.native.library}hook-${ant.os}-${ant.os.arch}.dll" />
+		<property name="ant.native.library" value="systemhook-${ant.os}-${ant.os.arch}.dll" />
 		
-		<cc objdir="${ant.dir.objects}" outfile="${ant.dir.library}/${ant.native.library.result}" subsystem="console" debug="${ant.native.debug}">
+		<cc objdir="${ant.dir.objects}" outfile="${ant.dir.library}/${ant.native.library}" subsystem="console" debug="${ant.native.debug}">
 			<compiler name="${ant.native.compiler}" />
 			<compilerarg value="-std=c99" />
 			
@@ -138,7 +131,7 @@ SOFTWARE.
 			<linkerarg value="-static" if="ant.os.windows" />
 			<linkerarg value="-add-stdcall-alias" if="ant.os.windows" />
 			
-			<fileset dir="${ant.dir.native}/${ant.native.library}/${ant.os}">
+			<fileset dir="${ant.dir.native}/${ant.os}">
 				<include name="**/*.c" />
 			</fileset>
 		</cc>
