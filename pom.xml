@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>lc.kra.system</groupId>
 	<artifactId>system-hook</artifactId>
-	<version>3.1</version>
+	<version>3.2</version>
 	<description>Global Keyboard / Mouse Hook for Java applications.</description>
 	<url>https://github.com/kristian/system-hook</url>
 
@@ -59,6 +59,17 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>com.github.maven-nar</groupId>
+				<artifactId>nar-maven-plugin</artifactId>
+				<version>3.5.2</version>
+				<extensions>true</extensions>
+				<configuration>
+					<!-- dummy dependency which later on gets used in the ant build task -->
+					<skip>true</skip>
 				</configuration>
 			</plugin>
 			
@@ -198,11 +209,6 @@
 	</developers>
 
 	<dependencies>
-		<dependency>
-			<groupId>ant-contrib</groupId>
-			<artifactId>cpptasks</artifactId>
-			<version>1.0b5</version>
-		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

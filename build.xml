@@ -34,10 +34,11 @@ SOFTWARE.
 		
 		<!-- Ant -->
 		<property name="settings.localRepository" value="${user.home}/.m2/repository" />
-		<taskdef name="cc" classname="net.sf.antcontrib.cpptasks.CCTask">
+		<taskdef name="cc" classname="com.github.maven_nar.cpptasks.CCTask">
 			<classpath>
 				<fileset dir="${settings.localRepository}">
-					<include name="ant-contrib/cpptasks/1.0b5/cpptasks-1.0b5.jar"/>
+					<include name="com/github/maven-nar/nar-maven-plugin/3.5.2/nar-maven-plugin-3.5.2.jar"/>
+					<include name="commons-io/commons-io/2.4/commons-io-2.4.jar"/>
 				</fileset>
 			</classpath>
 		</taskdef>
