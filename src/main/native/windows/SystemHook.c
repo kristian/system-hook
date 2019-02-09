@@ -25,6 +25,7 @@
 #include <jni.h>
 
 #ifdef DEBUG
+#include <stdio.h>
 #define DEBUG_PRINT(x) do{ printf x; fflush(stdout); } while(0)
 #else
 #define DEBUG_PRINT(x) do{ } while(0)
@@ -40,7 +41,9 @@ extern "C"
 const LPCSTR lpszClassNames[] = { "jkh" /* java keyboard hook */, "jmh" /* java mouse hook */ };
 const USHORT mouseLeftButton = RI_MOUSE_LEFT_BUTTON_DOWN|RI_MOUSE_LEFT_BUTTON_UP,
 	mouseRightButton = RI_MOUSE_RIGHT_BUTTON_DOWN|RI_MOUSE_RIGHT_BUTTON_UP,
-	mouseMiddleButton = RI_MOUSE_MIDDLE_BUTTON_DOWN|RI_MOUSE_MIDDLE_BUTTON_UP;
+	mouseMiddleButton = RI_MOUSE_MIDDLE_BUTTON_DOWN|RI_MOUSE_MIDDLE_BUTTON_UP,
+	mouseXButton1 = RI_MOUSE_BUTTON_4_DOWN|RI_MOUSE_BUTTON_4_UP,
+	mouseXButton2 = RI_MOUSE_BUTTON_5_DOWN|RI_MOUSE_BUTTON_5_UP;
 
 static inline void debugPrintLastError(TCHAR *szErrorText) {
 	DWORD dw = GetLastError();
@@ -135,6 +138,17 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)  {
 				case WM_MBUTTONUP:
 					mkButton = MK_MBUTTON;
 					break;
+				case WM_XBUTTONDOWN:
+					tState = (jint)TS_DOWN;
+					/* no break */
+				case WM_XBUTTONUP: {
+					int button = pStruct->mouseData >> 16 & 0xFFFF;
+	                if (button == 1)
+	                	mkButton += MK_XBUTTON1;
+	                else if (button == 2)
+	                	mkButton += MK_XBUTTON2;
+					break;
+				}
 				case WM_MOUSEMOVE:
 					tState = (jint)TS_MOVE;
 					if(lPosX!=lOldX||lOldX!=lOldY)
@@ -227,6 +241,14 @@ LRESULT CALLBACK WndProc(HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						} else if((buttonFlags&mouseMiddleButton)!=0) {
 							mkButton = MK_MBUTTON;
 							if((buttonFlags&RI_MOUSE_MIDDLE_BUTTON_DOWN)==RI_MOUSE_MIDDLE_BUTTON_DOWN)
+								tState = (jint)TS_DOWN;
+						} else if((buttonFlags&mouseXButton1)!=0) {
+							mkButton = MK_XBUTTON1;
+							if((buttonFlags&RI_MOUSE_BUTTON_4_DOWN)==RI_MOUSE_BUTTON_4_DOWN)
+								tState = (jint)TS_DOWN;
+						} else if((buttonFlags&mouseXButton2)!=0) {
+							mkButton = MK_XBUTTON2;
+							if((buttonFlags&RI_MOUSE_BUTTON_5_DOWN)==RI_MOUSE_BUTTON_5_DOWN)
 								tState = (jint)TS_DOWN;
 						}
 						// handle mouse buttons

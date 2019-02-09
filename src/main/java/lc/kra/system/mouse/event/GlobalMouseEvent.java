@@ -41,7 +41,9 @@ public class GlobalMouseEvent extends EventObject {
 		BUTTON_NO = 0x0, //No mouse button
 		BUTTON_LEFT = 1<<0, //Left mouse button
 		BUTTON_RIGHT = 1<<1, //Right mouse button
-		BUTTON_MIDDLE = 1<<4; //Middle mouse button
+		BUTTON_MIDDLE = 1<<4, //Middle mouse button
+		BUTTON_X1 = 1<<5, //First X mouse button
+		BUTTON_X2 = 1<<6; //Second X mouse button
 	
 	/**
 	 * Wheel delta parameter
@@ -136,6 +138,10 @@ public class GlobalMouseEvent extends EventObject {
 				builder.append("right,");
 			if((buttons&BUTTON_MIDDLE)!=BUTTON_NO)
 				builder.append("middle,");
+			if((buttons&BUTTON_X1)!=BUTTON_NO)
+				builder.append("firstx,");
+			if((buttons&BUTTON_X2)!=BUTTON_NO)
+				builder.append("secondx,");
 			if(transitionState==TS_WHEEL)
 				builder.append("delta ").append(delta).append(',');
 			return builder.deleteCharAt(builder.length()-1).append(']').toString();
