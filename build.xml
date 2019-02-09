@@ -117,6 +117,7 @@ SOFTWARE.
 			<compilerarg value="-Wall" />
 			<compilerarg value="-Wextra" />
 			<compilerarg value="-Wno-unused-parameter" />
+			<compilerarg value="-Wimplicit-fallthrough=0" />
 			
 			<compilerarg value="-D_JNI_IMPLEMENTATION_" />
 			
