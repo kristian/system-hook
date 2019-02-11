@@ -22,7 +22,7 @@ public class GlobalKeyboardExample {
 
 		System.out.println("Global keyboard hook successfully started, press [escape] key to shutdown. Connected keyboards:");
 		
-		for (Entry<Long,String> keyboard:GlobalKeyboardHook.listKeyboards().entrySet()) {
+		for (Entry<Long, String> keyboard : GlobalKeyboardHook.listKeyboards().entrySet()) {
 			System.out.format("%d: %s\n", keyboard.getKey(), keyboard.getValue());
 		}
 		
