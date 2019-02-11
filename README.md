@@ -17,8 +17,8 @@ public class GlobalKeyboardExample {
 	private static boolean run = true;
 	
 	public static void main(String[] args) {
-		// might throw a UnsatisfiedLinkError if the native library fails to load or a RuntimeException if hooking fails 
-		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true); // use false here to switch to hook instead of raw input
+		// Might throw a UnsatisfiedLinkError if the native library fails to load or a RuntimeException if hooking fails 
+		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true); // Use false here to switch to hook instead of raw input
 
 		System.out.println("Global keyboard hook successfully started, press [escape] key to shutdown. Connected keyboards:");
 		
@@ -49,7 +49,7 @@ public class GlobalKeyboardExample {
 		} catch(InterruptedException e) { 
 			//Do nothing
 		} finally {
-			mouseHook.shutdownHook(); 
+			keyboardHook.shutdownHook(); 
 		}
 	}
 }
@@ -68,8 +68,8 @@ public class GlobalMouseExample {
 	private static boolean run = true;
 	
 	public static void main(String[] args) {
-		// might throw a UnsatisfiedLinkError if the native library fails to load or a RuntimeException if hooking fails 
-		GlobalMouseHook mouseHook = new GlobalMouseHook(); // add true to the constructor, to switch to raw input mode
+		// Might throw a UnsatisfiedLinkError if the native library fails to load or a RuntimeException if hooking fails 
+		GlobalMouseHook mouseHook = new GlobalMouseHook(); // Add true to the constructor, to switch to raw input mode
 
 		System.out.println("Global mouse hook successfully started, press [middle] mouse button to shutdown. Connected mice:");
 		
