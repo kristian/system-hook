@@ -47,6 +47,8 @@ public class GlobalKeyboardExample {
 				Thread.sleep(128); 
 			}
 		} catch(InterruptedException e) { 
+			//Do nothing
+		} finally {
 			mouseHook.shutdownHook(); 
 		}
 	}
@@ -110,6 +112,8 @@ public class GlobalMouseExample {
 				Thread.sleep(128); 
 			}
 		} catch(InterruptedException e) { 
+			//Do nothing
+		} finally {
 			mouseHook.shutdownHook(); 
 		}
 	}
