@@ -269,11 +269,11 @@ public class GlobalKeyEvent extends EventObject {
 	 */
 	public boolean isControlPressed() { return controlPressed; }
 	/**
-	 * Returns true if the control key is pressed on the keyboard.
+	 * Returns true if the windows key is pressed on the keyboard.
 	 */
 	public boolean isWinPressed() { return winPressed; }
 	/**
-	 * Returns true if the menu/shift/control key pressed is an extended key.
+	 * Returns true if the menu/shift/control/win key pressed is an extended key.
 	 */
 	public boolean isExtendedKey() { return extendedKey; }
 	
