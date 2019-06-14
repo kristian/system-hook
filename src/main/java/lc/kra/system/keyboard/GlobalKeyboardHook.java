@@ -31,6 +31,7 @@ import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RCONTROL;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RMENU;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RSHIFT;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RWIN;
+import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_LWIN;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_SHIFT;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class GlobalKeyboardHook {
 	
 	private BlockingQueue<GlobalKeyEvent> inputBuffer =
 		new LinkedBlockingQueue<GlobalKeyEvent>();
-	private boolean menuPressed, shiftPressed, controlPressed, extendedKey;
+	private boolean menuPressed, shiftPressed, controlPressed, winPressed, extendedKey;
 	
 	private List<GlobalKeyListener> listeners = new CopyOnWriteArrayList<GlobalKeyListener>();
 	private Thread eventDispatcher = new Thread() {{
@@ -104,7 +105,7 @@ public class GlobalKeyboardHook {
 			 */
 			@Override public void handleKey(int virtualKeyCode, int transitionState, char keyChar, long deviceHandle) {
 				switchControlKeys(virtualKeyCode, transitionState);
-				inputBuffer.add(new GlobalKeyEvent(this, virtualKeyCode, transitionState, keyChar, menuPressed, shiftPressed, controlPressed, extendedKey, deviceHandle));			
+				inputBuffer.add(new GlobalKeyEvent(this, virtualKeyCode, transitionState, keyChar, menuPressed, shiftPressed, controlPressed, winPressed, extendedKey, deviceHandle));			
 			}
 		};
 		
@@ -212,9 +213,12 @@ public class GlobalKeyboardHook {
 	 * Switch control states for menu/shift/control
 	 */
 	private void switchControlKeys(int virtualKeyCode, int transitionState) {
-		boolean downTransition = transitionState==TS_DOWN;
+		boolean downTransition = (transitionState==TS_DOWN);
 		switch(virtualKeyCode) {
-		case VK_RWIN: extendedKey = downTransition; break;
+		case VK_RWIN: extendedKey = downTransition; 
+		case VK_LWIN: 
+			winPressed = downTransition;
+			break;
 		case VK_RMENU: extendedKey = downTransition;
 		case VK_MENU: case VK_LMENU:
 			menuPressed = downTransition;
