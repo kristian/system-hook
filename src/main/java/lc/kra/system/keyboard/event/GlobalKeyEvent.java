@@ -218,10 +218,11 @@ public class GlobalKeyEvent extends EventObject {
 		menuPressed,
 		shiftPressed,
 		controlPressed,
+		winPressed,
 		extendedKey;
 	private long deviceHandle;
 
-	public GlobalKeyEvent(Object source, int virtualKeyCode, int transitionState, char keyChar, boolean menuPressed, boolean shiftPressed, boolean controlPressed, boolean extendedKey, long deviceHandle) {
+	public GlobalKeyEvent(Object source, int virtualKeyCode, int transitionState, char keyChar, boolean menuPressed, boolean shiftPressed, boolean controlPressed, boolean winPressed, boolean extendedKey, long deviceHandle) {
 		super(source);
 		this.virtualKeyCode = virtualKeyCode;
 		this.transitionState = transitionState;
@@ -229,6 +230,7 @@ public class GlobalKeyEvent extends EventObject {
 		this.menuPressed = menuPressed;
 		this.shiftPressed = shiftPressed;
 		this.controlPressed = controlPressed;
+		this.winPressed = winPressed;
 		this.extendedKey = extendedKey;
 		this.deviceHandle = deviceHandle;
 	}
@@ -267,7 +269,11 @@ public class GlobalKeyEvent extends EventObject {
 	 */
 	public boolean isControlPressed() { return controlPressed; }
 	/**
-	 * Returns true if the menu/shift/control key pressed is an extended key.
+	 * Returns true if the windows key is pressed on the keyboard.
+	 */
+	public boolean isWinPressed() { return winPressed; }
+	/**
+	 * Returns true if the menu/shift/control/win key pressed is an extended key.
 	 */
 	public boolean isExtendedKey() { return extendedKey; }
 	
@@ -287,6 +293,7 @@ public class GlobalKeyEvent extends EventObject {
 		if(menuPressed) builder.append(",menu");
 		if(shiftPressed) builder.append(",shift");
 		if(controlPressed) builder.append(",control");
+		if(winPressed) builder.append(",win");
 		if(extendedKey) builder.append(",extended");
 		return builder.append(']').toString();
 	}
