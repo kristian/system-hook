@@ -68,7 +68,7 @@ DWORD hookThreadId[2] = { 0, 0 };
 BYTE keyState[256];
 WCHAR buffer[4];
 
-jint lOldX = (jint)SHRT_MIN, lOldY = (jint)SHRT_MIN;
+jint lMode = 0, lOldX = (jint)SHRT_MIN, lOldY = (jint)SHRT_MIN;
 
 BOOL APIENTRY DllMain(HINSTANCE _hInst, DWORD reason, LPVOID reserved) {
 	switch(reason) {
@@ -112,7 +112,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)  
 
 	handleKey("LowLevelKeyboardProc", wParam, pStruct->vkCode, pStruct->scanCode, 0);
 
-	return CallNextHookEx(NULL, nCode, wParam, lParam);
+	return nCode<0 || lMode != MODE_FINAL ? CallNextHookEx(NULL, nCode, wParam, lParam) : -1;
 }
 LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)  {
 	if(nCode==HC_ACTION) {
@@ -163,7 +163,7 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)  {
 		} else DEBUG_PRINT(("NATIVE: LowLevelMouseProc - Error on the attach current thread.\n"));
 	}
 
-	return CallNextHookEx(NULL, nCode, wParam, lParam);
+	return nCode<0 || lMode != MODE_FINAL ? CallNextHookEx(NULL, nCode, wParam, lParam) : -1;
 }
 LRESULT CALLBACK WndProc(HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch(uMsg){
@@ -291,7 +291,7 @@ static inline _Bool notifyHookObj(JNIEnv *env, size_t hook) {
 	return TRUE;
 }
 
-static inline jint registerHook(JNIEnv *env, jobject thisObj, size_t hook, const char *handleName, const char *handleSig, jboolean raw) {
+static inline jint registerHook(JNIEnv *env, jobject thisObj, size_t hook, const char *handleName, const char *handleSig, jint mode) {
 	DEBUG_PRINT(("NATIVE: registerHook - Hook start\n"));
 	
 	if(jvm==NULL) (*env)->GetJavaVM(env, &jvm);
@@ -306,8 +306,8 @@ static inline jint registerHook(JNIEnv *env, jobject thisObj, size_t hook, const
 	}
 
 	HHOOK hHook; HWND hWnd;
-	switch(raw) {
-		case JNI_FALSE:
+	switch(lMode=mode) {
+		case MODE_DEFAULT: case MODE_FINAL:
 			switch(hook) {
 				case HOOK_KEYBOARD:
 					hHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInst, 0);
@@ -318,7 +318,7 @@ static inline jint registerHook(JNIEnv *env, jobject thisObj, size_t hook, const
 			}
 
 			break;
-		case JNI_TRUE: {
+		case MODE_RAW: {
 			WNDCLASS wndCls = {0};
 			wndCls.lpfnWndProc = WndProc;
 			wndCls.hInstance = hInst;
@@ -334,7 +334,7 @@ static inline jint registerHook(JNIEnv *env, jobject thisObj, size_t hook, const
 	if(hHook==NULL&&hWnd==NULL) {
 		debugPrintLastError("NATIVE: registerHook - Hook failed");
 		return (jint)E_HOOK_FAILED;
-	} else DEBUG_PRINT(("NATIVE: registerHook - %sHook success\n", raw?"Raw ":""));
+	} else DEBUG_PRINT(("NATIVE: registerHook - %sHook success\n", lMode==MODE_RAW?"Raw ":""));
 
 	if(!notifyHookObj(env, hook)) {
 		(*env)->ExceptionClear(env);
@@ -357,11 +357,11 @@ static inline jint registerHook(JNIEnv *env, jobject thisObj, size_t hook, const
 		return (jint)E_UNHOOK_FAILED;
 	}
 }
-JNIEXPORT jint JNICALL Java_lc_kra_system_keyboard_GlobalKeyboardHook_00024NativeKeyboardHook_registerHook(JNIEnv *env, jobject thisObj, jboolean raw) {
-	return registerHook(env, thisObj, HOOK_KEYBOARD, "handleKey", "(IICJ)V", raw);
+JNIEXPORT jint JNICALL Java_lc_kra_system_keyboard_GlobalKeyboardHook_00024NativeKeyboardHook_registerHook(JNIEnv *env, jobject thisObj, jint mode) {
+	return registerHook(env, thisObj, HOOK_KEYBOARD, "handleKey", "(IICJ)V", mode);
 }
-JNIEXPORT jint JNICALL Java_lc_kra_system_mouse_GlobalMouseHook_00024NativeMouseHook_registerHook(JNIEnv *env, jobject thisObj, jboolean raw) {
-	return registerHook(env, thisObj, HOOK_MOUSE, "handleMouse", "(IIIIIJ)V", raw);
+JNIEXPORT jint JNICALL Java_lc_kra_system_mouse_GlobalMouseHook_00024NativeMouseHook_registerHook(JNIEnv *env, jobject thisObj, jint mode) {
+	return registerHook(env, thisObj, HOOK_MOUSE, "handleMouse", "(IIIIIJ)V", mode);
 }
 
 static inline void unregisterHook(size_t hook) {

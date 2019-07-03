@@ -21,6 +21,8 @@
  */
 package lc.kra.system.mouse;
 
+import static lc.kra.system.GlobalHookMode.DEFAULT;
+import static lc.kra.system.GlobalHookMode.RAW;
 import static lc.kra.system.mouse.event.GlobalMouseEvent.BUTTON_NO;
 import static lc.kra.system.mouse.event.GlobalMouseEvent.TS_DOWN;
 import static lc.kra.system.mouse.event.GlobalMouseEvent.TS_MOVE;
@@ -33,6 +35,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import lc.kra.system.GlobalHookMode;
 import lc.kra.system.LibraryLoader;
 import lc.kra.system.mouse.event.GlobalMouseEvent;
 import lc.kra.system.mouse.event.GlobalMouseListener;
@@ -99,11 +102,22 @@ public class GlobalMouseHook {
 	 * @throws UnsatisfiedLinkError Thrown if loading the native library failed
 	 * @throws RuntimeException Thrown if registering the low-level keyboard hook failed
 	 */
-	public GlobalMouseHook(boolean raw) throws UnsatisfiedLinkError {
+	public GlobalMouseHook(boolean raw) throws UnsatisfiedLinkError { this(raw?RAW:DEFAULT);	}
+	
+	/**
+	 * Instantiate a new GlobalMouseHook.
+	 * 
+	 * @see #GlobalMouseHook()
+	 * 
+	 * @param mode The mode to capture the input
+	 * @throws UnsatisfiedLinkError Thrown if loading the native library failed
+	 * @throws RuntimeException Thrown if registering the low-level keyboard hook failed
+	 */
+	public GlobalMouseHook(GlobalHookMode mode) throws UnsatisfiedLinkError {
 		LibraryLoader.loadLibrary(); // load the library, in case it's not already loaded
 		
 		// register a mouse hook (throws a RuntimeException in case something goes wrong)
-		mouseHook = new NativeMouseHook(raw) {
+		mouseHook = new NativeMouseHook(mode) {
 			/**
 			 * Handle the input transitionState create event and add it to the inputBuffer
 			 */
@@ -199,13 +213,13 @@ public class GlobalMouseHook {
 	
 	private static abstract class NativeMouseHook extends Thread {
 		private int status;
-		private boolean raw;
+		private GlobalHookMode mode;
 		
-		public NativeMouseHook(boolean raw)  {
+		public NativeMouseHook(GlobalHookMode mode)  {
 			super("Global Mouse Hook Thread");
 			setDaemon(false); setPriority(MAX_PRIORITY);
 			synchronized(this) {
-				this.raw = raw;
+				this.mode = mode;
 				try { start(); wait(); }
 				catch (InterruptedException e) {
 					throw new RuntimeException(e);
@@ -217,12 +231,12 @@ public class GlobalMouseHook {
 		}
 		
 		@Override public void run() {
-			status = registerHook(raw);
+			status = registerHook(mode.ordinal());
 			synchronized(this) {
 				notifyAll(); }
 		}
 
-		public native final int registerHook(boolean raw);
+		public native final int registerHook(int mode);
 		public native final void unregisterHook();
 		
 		public static native final Map<Long,String> listDevices();

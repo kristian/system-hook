@@ -21,17 +21,19 @@
  */
 package lc.kra.system.keyboard;
 
+import static lc.kra.system.GlobalHookMode.DEFAULT;
+import static lc.kra.system.GlobalHookMode.RAW;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.TS_DOWN;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_CONTROL;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_LCONTROL;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_LMENU;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_LSHIFT;
+import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_LWIN;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_MENU;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RCONTROL;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RMENU;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RSHIFT;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RWIN;
-import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_LWIN;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_SHIFT;
 
 import java.util.List;
@@ -40,6 +42,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import lc.kra.system.GlobalHookMode;
 import lc.kra.system.LibraryLoader;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
 import lc.kra.system.keyboard.event.GlobalKeyListener;
@@ -95,11 +98,22 @@ public class GlobalKeyboardHook {
 	 * @throws UnsatisfiedLinkError Thrown if loading the native library failed
 	 * @throws RuntimeException Thrown if registering the low-level keyboard hook failed
 	 */
-	public GlobalKeyboardHook(boolean raw) throws UnsatisfiedLinkError {
+	public GlobalKeyboardHook(boolean raw) throws UnsatisfiedLinkError { this(raw?RAW:DEFAULT);	}
+	
+	/**
+	 * Instantiate a new GlobalKeyboardHook.
+	 * 
+	 * @see #GlobalKeyboardHook()
+	 * 
+	 * @param mode The mode to capture the input
+	 * @throws UnsatisfiedLinkError Thrown if loading the native library failed
+	 * @throws RuntimeException Thrown if registering the low-level keyboard hook failed
+	 */
+	public GlobalKeyboardHook(GlobalHookMode mode) throws UnsatisfiedLinkError {
 		LibraryLoader.loadLibrary(); // load the library, in case it's not already loaded
 		
 		// register a keyboard hook (throws a RuntimeException in case something goes wrong)
-		keyboardHook = new NativeKeyboardHook(raw) {
+		keyboardHook = new NativeKeyboardHook(mode) {
 			/**
 			 * Handle the input virtualKeyCode and transitionState, create event and add it to the inputBuffer
 			 */
@@ -178,13 +192,13 @@ public class GlobalKeyboardHook {
 	
 	private static abstract class NativeKeyboardHook extends Thread {
 		private int status;
-		private boolean raw;
+		private GlobalHookMode mode;
 		
-		public NativeKeyboardHook(boolean raw)  {
+		public NativeKeyboardHook(GlobalHookMode mode)  {
 			super("Global Keyboard Hook Thread");
 			setDaemon(false); setPriority(MAX_PRIORITY);
 			synchronized(this) {
-				this.raw = raw;
+				this.mode = mode;
 				try { start(); wait(); }
 				catch (InterruptedException e) {
 					throw new RuntimeException(e);
@@ -196,12 +210,12 @@ public class GlobalKeyboardHook {
 		}
 		
 		@Override public void run() {
-			status = registerHook(raw);
+			status = registerHook(mode.ordinal());
 			synchronized(this) {
 				notifyAll(); }
 		}
 		
-		public native final int registerHook(boolean raw);
+		public native final int registerHook(int mode);
 		public native final void unregisterHook();
 		
 		public static native final Map<Long,String> listDevices();

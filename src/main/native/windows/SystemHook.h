@@ -37,6 +37,12 @@ typedef enum {
 } GlobalHookError;
 
 typedef enum {
+	MODE_DEFAULT = 0,
+	MODE_FINAL = 1,
+	MODE_RAW = 2
+} GlobalHookMode;
+
+typedef enum {
     TS_UP = 0,
 	TS_DOWN = 1,
 	TS_MOVE = 2,
@@ -48,7 +54,7 @@ typedef enum {
  * Method:    registerHook
  * Signature: (Z)I
  */
-JNIEXPORT jint JNICALL Java_lc_kra_system_keyboard_GlobalKeyboardHook_00024NativeKeyboardHook_registerHook(JNIEnv *,jobject,jboolean);
+JNIEXPORT jint JNICALL Java_lc_kra_system_keyboard_GlobalKeyboardHook_00024NativeKeyboardHook_registerHook(JNIEnv *,jobject,jint);
 /*
  * Class:     GlobalKeyboardHook$NativeKeyboardHook
  * Method:    unregisterHook
@@ -67,7 +73,7 @@ JNIEXPORT jobject JNICALL Java_lc_kra_system_keyboard_GlobalKeyboardHook_00024Na
  * Method:    registerHook
  * Signature: (Z)I
  */
-JNIEXPORT jint JNICALL Java_lc_kra_system_mouse_GlobalMouseHook_00024NativeMouseHook_registerHook(JNIEnv *,jobject,jboolean);
+JNIEXPORT jint JNICALL Java_lc_kra_system_mouse_GlobalMouseHook_00024NativeMouseHook_registerHook(JNIEnv *,jobject,jint);
 /*
  * Class:     GlobalMouseHook$NativeMouseHook
  * Method:    unregisterHook
