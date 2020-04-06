@@ -36,8 +36,10 @@ import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RSHIFT;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_RWIN;
 import static lc.kra.system.keyboard.event.GlobalKeyEvent.VK_SHIFT;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -57,6 +59,9 @@ public class GlobalKeyboardHook {
 	private boolean menuPressed, shiftPressed, controlPressed, winPressed, extendedKey;
 	
 	private List<GlobalKeyListener> listeners = new CopyOnWriteArrayList<GlobalKeyListener>();
+	
+	private Set<Integer> heldDownKeyCodes = new HashSet<Integer>();
+	
 	private Thread eventDispatcher = new Thread() {{
 			setName("Global Keyboard Hook Dispatcher");
 			setDaemon(true);
@@ -146,19 +151,52 @@ public class GlobalKeyboardHook {
 	 * @param event A global key event
 	 */
 	private void keyPressed(GlobalKeyEvent event) {
+		heldDownKeyCodes.add(event.getVirtualKeyCode());
+		
 		for(GlobalKeyListener listener:listeners)
 			listener.keyPressed(event);
 	}
+	
 	/**
 	 * Invoke keyReleased (transition state TS_UP) for all registered listeners
 	 * 
 	 * @param event A global key event
 	 */
 	private void keyReleased(GlobalKeyEvent event) {
+		heldDownKeyCodes.remove(event.getVirtualKeyCode());
+		
 		for(GlobalKeyListener listener:listeners)
 			listener.keyReleased(event);
 	}
 
+	/**
+	 * Checks if the specified key is currently held down
+	 * 
+	 * @param virtualKeyCode the virtual code of the key, use constants in {@link GlobalKeyEvent}
+	 * 
+	 * @return true if the key is currently held down
+	 */
+	public boolean isKeyHeldDown(int virtualKeyCode) {
+		return heldDownKeyCodes.contains(virtualKeyCode);
+	}
+	
+	
+	/**
+	 * Checks if all the specified keys are currently held down
+	 * 
+	 * @param virtualKeyCodes any number of specified key codes, use constants in {@link GlobalKeyEvent}
+	 * 
+	 * @return true if all the specified keys are currently held down, false if any of the keys is not currently held down
+	 */
+	public boolean areKeysHeldDown(int... virtualKeyCodes) {
+		for(int keyCode : virtualKeyCodes) {
+			if(!isKeyHeldDown(keyCode)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	/**
 	 * Checks whether the keyboard hook is still alive and capturing inputs
 	 * 
