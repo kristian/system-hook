@@ -106,18 +106,7 @@
 							</target>
 						</configuration>
 					</execution>
-					<execution>
-						<id>compile-native</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<ant/>
-							</target>
-						</configuration>
-					</execution>
+
 					<execution>
 						<id>delete-history</id>
 						<phase>process-classes</phase>
