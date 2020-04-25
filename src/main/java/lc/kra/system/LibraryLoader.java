@@ -37,9 +37,8 @@ public class LibraryLoader {
 	private static boolean libraryLoad;
 	
 	/**
-	 * Tries to laod the library with the given name
+	 * Tries to load the system hook library with the given name
 	 * 
-	 * @param name The name of the library to load
 	 * @throws UnsatisfiedLinkError Thrown in case loading the library fails
 	 */
 	public static synchronized void loadLibrary() throws UnsatisfiedLinkError {

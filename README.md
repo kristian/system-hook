@@ -130,29 +130,14 @@ Feel free to use the classes `lc.kra.system.keyboard.GobalKeyboardHook` and `lc.
 The `LibraryLoader` will first attempt to load the native libraries from the `java.library.path` and fall back checking the archives `/lc/kra/system/lib` package, if no libraries where found.
 
 ### Maven Dependency
-You can include `system-hook` from this GitHub repository by adding this dependency to your `pom.xml`:
+You can include `system-hook` as a dependency from Maven Central by adding it to your `pom.xml`:
 
 ```xml
 <dependency>
   <groupId>lc.kra.system</groupId>
   <artifactId>system-hook</artifactId>
-  <version>3.6</version>
+  <version>3.7</version>
 </dependency>
-```
-
-Additionally you will have to add the following repository to your `pom.xml`:
-
-```xml
-<repositories>
-  <repository>
-    <id>system-hook-mvn-repo</id>
-    <url>https://raw.github.com/kristian/system-hook/mvn-repo/</url>
-    <snapshots>
-      <enabled>true</enabled>
-      <updatePolicy>always</updatePolicy>
-    </snapshots>
-  </repository>
-</repositories>
 ```
 
 Build

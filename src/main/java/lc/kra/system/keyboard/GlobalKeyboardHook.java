@@ -148,7 +148,7 @@ public class GlobalKeyboardHook {
 	/**
 	 * Invoke keyPressed (transition state TS_DOWN) for all registered listeners
 	 * 
-	 * @param event A global key event
+	 * @param event a global key event
 	 */
 	private void keyPressed(GlobalKeyEvent event) {
 		heldDownKeyCodes.add(event.getVirtualKeyCode());
@@ -160,7 +160,7 @@ public class GlobalKeyboardHook {
 	/**
 	 * Invoke keyReleased (transition state TS_UP) for all registered listeners
 	 * 
-	 * @param event A global key event
+	 * @param event a global key event
 	 */
 	private void keyReleased(GlobalKeyEvent event) {
 		heldDownKeyCodes.remove(event.getVirtualKeyCode());

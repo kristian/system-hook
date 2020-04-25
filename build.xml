@@ -103,7 +103,7 @@ SOFTWARE.
 		<property name="ant.native.linker" value="${ant.native.compiler}" />		
 	</target>
 	
-	<target name="compile" depends="initialize" description="Compiles JNI source files.">
+	<target name="compile" depends="initialize" description="Compiles JNI source files." unless="skipNativeCompile">
 		<property name="ant.native.library" value="systemhook-${ant.os}-${ant.os.arch}.dll" />
 		
 		<cc objdir="${ant.dir.objects}" outfile="${ant.dir.library}/${ant.native.library}" subsystem="console" debug="${ant.native.debug}">

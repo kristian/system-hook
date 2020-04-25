@@ -26,11 +26,15 @@ import java.util.EventListener;
 public interface GlobalKeyListener extends EventListener {
     /**
      * Invoked when a key has been pressed.
+     * 
+     * @param event a global key event
      */
 	public void keyPressed(GlobalKeyEvent event);
 	
     /**
      * Invoked when a key has been released.
+     * 
+     * @param event a global key event
      */
 	public void keyReleased(GlobalKeyEvent event);
 }

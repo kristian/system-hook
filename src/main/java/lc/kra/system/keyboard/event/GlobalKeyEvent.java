@@ -251,34 +251,34 @@ public class GlobalKeyEvent extends EventObject {
 	 * Returns the transition state (up or down) for this key event.
 	 * 
 	 * @return either one of TS_UP or TS_DOWN.
-	 * @see {@link #TS_UP}
-	 * @see {@link #TS_DOWN}
+	 * @see #TS_UP
+	 * @see #TS_DOWN
 	 */
 	public int getTransitionState() { return transitionState; }
 	
 	/**
-	 * Returns true if the menu key (alt) is pressed on the keyboard.
+	 * @return true if the menu key (alt) is pressed on the keyboard.
 	 */
 	public boolean isMenuPressed() { return menuPressed; }
 	/**
-	 * Returns true if the shift key is pressed on the keyboard.
+	 * @return true if the shift key is pressed on the keyboard.
 	 */
 	public boolean isShiftPressed() { return shiftPressed; }
 	/**
-	 * Returns true if the control key is pressed on the keyboard.
+	 * @return true if the control key is pressed on the keyboard.
 	 */
 	public boolean isControlPressed() { return controlPressed; }
 	/**
-	 * Returns true if the windows key is pressed on the keyboard.
+	 * @return true if the windows key is pressed on the keyboard.
 	 */
 	public boolean isWinPressed() { return winPressed; }
 	/**
-	 * Returns true if the menu/shift/control/win key pressed is an extended key.
+	 * @return true if the menu/shift/control/win key pressed is an extended key.
 	 */
 	public boolean isExtendedKey() { return extendedKey; }
 	
 	/**
-	 * Returns the handle of the keyboard the key was pressed on.
+	 * @return the handle of the keyboard the key was pressed on.
 	 */
 	public long getDeviceHandle() { return deviceHandle; }
 	

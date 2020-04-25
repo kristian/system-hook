@@ -26,20 +26,29 @@ import java.util.EventListener;
 public interface GlobalMouseListener extends EventListener {
     /**
      * Invoked when a mouse button has been pressed.
+     * 
+     * @param event a global mouse event
      */
 	public void mousePressed(GlobalMouseEvent event);
+
     /**
      * Invoked when a mouse button has been released.
+     * 
+     * @param event a global mouse event
      */
 	public void mouseReleased(GlobalMouseEvent event);
 	
 	/**
      * Invoked when the mouse was moved.
+     * 
+     * @param event a global mouse event
      */
 	public void mouseMoved(GlobalMouseEvent event);
 	
 	/**
      * Invoked when a mouse wheel was scrolled.
+     * 
+     * @param event a global mouse event
      */
 	public void mouseWheel(GlobalMouseEvent event);
 }

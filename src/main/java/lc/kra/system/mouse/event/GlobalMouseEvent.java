@@ -69,10 +69,10 @@ public class GlobalMouseEvent extends EventObject {
 	 * Returns the transition state (mouse up/down, move or mouse wheel) for this mouse event.
 	 * 
 	 * @return either one of TS_UP, TS_DOWN, TS_MOVE, TS_WHEEL.
-	 * @see {@link #TS_UP}
-	 * @see {@link #TS_DOWN}
-	 * @see {@link #TS_MOVE}
-	 * @see {@link #TS_WHEEL}
+	 * @see #TS_UP
+	 * @see #TS_DOWN
+	 * @see #TS_MOVE
+	 * @see #TS_WHEEL
 	 */
 	public int getTransitionState() { return transitionState; }
 	
@@ -81,10 +81,10 @@ public class GlobalMouseEvent extends EventObject {
 	 * 
 	 * @return One of BUTTON_LEFT, BUTTON_RIGHT, BUTTON_MIDDLE or BUTTON_NO if not in transition state {@link #TS_UP} or {@link #TS_DOWN}.
 	 * @see #getTransitionState()
-	 * @see {@link #BUTTON_NO}
-	 * @see {@link #BUTTON_LEFT}
-	 * @see {@link #BUTTON_RIGHT}
-	 * @see {@link #BUTTON_MIDDLE}
+	 * @see #BUTTON_NO
+	 * @see #BUTTON_LEFT
+	 * @see #BUTTON_RIGHT
+	 * @see #BUTTON_MIDDLE
 	 */
 	public int getButton() { return button; }
 	/**
@@ -92,7 +92,7 @@ public class GlobalMouseEvent extends EventObject {
 	 * one button is pressed the same value as for {@link #getButton()} is returned.
 	 * 
 	 * @return The bitwise addition of {@link #BUTTON_LEFT}, {@link #BUTTON_RIGHT} and {@link #BUTTON_MIDDLE}.
-	 * @see {@link #getButton()}
+	 * @see #getButton()
 	 */
 	public int getButtons() { return buttons; }
 	
@@ -119,7 +119,7 @@ public class GlobalMouseEvent extends EventObject {
 	public int getDelta() { return delta; }
 	
 	/**
-	 * Returns the handle of the mouse the input was received from.
+	 * @return the handle of the mouse the input was received from.
 	 */
 	public long getDeviceHandle() { return deviceHandle; }
 	

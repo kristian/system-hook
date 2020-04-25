@@ -23,12 +23,12 @@ package lc.kra.system.keyboard.event;
 
 public class GlobalKeyAdapter implements GlobalKeyListener {
     /**
-     * Invoked when a key has been pressed.
+     * @see GlobalKeyListener#keyPressed(GlobalKeyEvent)
      */
 	@Override public void keyPressed(GlobalKeyEvent event) {}
 	
     /**
-     * Invoked when a key has been released.
+     * @see GlobalKeyListener#keyReleased(GlobalKeyEvent)
      */
 	@Override public void keyReleased(GlobalKeyEvent event) {}
 }

@@ -23,21 +23,22 @@ package lc.kra.system.mouse.event;
 
 public class GlobalMouseAdapter implements GlobalMouseListener {
     /**
-     * Invoked when a mouse button has been pressed.
+     * @see GlobalMouseListener#mousePressed(GlobalMouseEvent)
      */
 	@Override public void mousePressed(GlobalMouseEvent event) {}
+
 	/**
-     * Invoked when a mouse button was released.
+     * @see GlobalMouseListener#mouseReleased(GlobalMouseEvent)
      */
 	@Override public void mouseReleased(GlobalMouseEvent event) {}
 	
 	/**
-     * Invoked when the mouse was moved.
+     * @see GlobalMouseListener#mouseMoved(GlobalMouseEvent)
      */
 	@Override public void mouseMoved(GlobalMouseEvent event) {}
 	
 	/**
-     * Invoked when a mouse wheel was scrolled.
+     * @see GlobalMouseListener#mouseWheel(GlobalMouseEvent)
      */
 	@Override public void mouseWheel(GlobalMouseEvent event) {}
 }

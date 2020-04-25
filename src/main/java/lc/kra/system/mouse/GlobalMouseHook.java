@@ -146,7 +146,7 @@ public class GlobalMouseHook {
 	/**
 	 * Invoke mousePressed (transition state TS_DOWN) for all registered listeners
 	 * 
-	 * @param event A global mouse event
+	 * @param event a global mouse event
 	 */
 	private void mousePressed(GlobalMouseEvent event) {
 		for(GlobalMouseListener listener:listeners)
@@ -155,7 +155,7 @@ public class GlobalMouseHook {
 	/**
 	 * Invoke mouseReleased (transition state TS_UP) for all registered listeners
 	 * 
-	 * @param event A global mouse event
+	 * @param event a global mouse event
 	 */
 	private void mouseReleased(GlobalMouseEvent event) {
 		for(GlobalMouseListener listener:listeners)
@@ -164,7 +164,7 @@ public class GlobalMouseHook {
 	/**
 	 * Invoke mouseMoved (transition state TS_MOVE) for all registered listeners
 	 * 
-	 * @param event A global mouse event
+	 * @param event a global mouse event
 	 */
 	private void mouseMoved(GlobalMouseEvent event) {
 		for(GlobalMouseListener listener:listeners)
@@ -173,7 +173,7 @@ public class GlobalMouseHook {
 	/**
 	 * Invoke mouseWheel (transition state TS_WHEEL) for all registered listeners
 	 * 
-	 * @param event A global mouse event
+	 * @param event a global mouse event
 	 */
 	private void mouseWheel(GlobalMouseEvent event) {
 		for(GlobalMouseListener listener:listeners)
