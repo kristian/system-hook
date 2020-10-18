@@ -136,7 +136,7 @@ You can include `system-hook` as a dependency from Maven Central by adding it to
 <dependency>
   <groupId>lc.kra.system</groupId>
   <artifactId>system-hook</artifactId>
-  <version>3.7</version>
+  <version>3.8</version>
 </dependency>
 ```
 

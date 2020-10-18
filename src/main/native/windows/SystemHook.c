@@ -216,7 +216,6 @@ LRESULT CALLBACK WndProc(HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					UINT event = raw->data.keyboard.Message;
 					USHORT vkCode = raw->data.keyboard.VKey,
 						scanCode = raw->data.keyboard.MakeCode;
-					free(lpb); // free this now to save memory
 
 					handleKey("WndProc", event, vkCode, scanCode, hDevice);
 
@@ -225,7 +224,6 @@ LRESULT CALLBACK WndProc(HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case RIM_TYPEMOUSE: {
 					LONG lLastX = raw->data.mouse.lLastX, lLastY = raw->data.mouse.lLastY;
 					USHORT buttonFlags = raw->data.mouse.usButtonFlags, buttonData = raw->data.mouse.usButtonData;
-					free(lpb); // free this now to save memory
 
 					JNIEnv* env;
 					if((*jvm)->AttachCurrentThread(jvm, (void**)&env, NULL)>=JNI_OK) {
@@ -267,11 +265,25 @@ LRESULT CALLBACK WndProc(HWND hWndMain, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					break;
 				}
 			}
+
+			DefRawInputProc(&raw, 1, sizeof(RAWINPUTHEADER));
+			free(lpb); // free this now to save memory
+
 			break;
 		}
-		case WM_CLOSE:
+		case WM_CLOSE: {
+			// determine the hook window (by the hWndMain)
+			size_t hook = SHRT_MAX; for(size_t ridIdx=0;ridIdx<sizeof(rid)/sizeof(rid[0]);ridIdx++)
+				if(rid[ridIdx].hwndTarget == hWndMain)
+					{ hook = ridIdx; break; }
+			if(hook==SHRT_MAX) return FALSE; // unknown hook
+
+			rid[hook].dwFlags = RIDEV_REMOVE;
+			RegisterRawInputDevices(&rid[hook], 1, sizeof(rid[hook]));
+
 			PostQuitMessage(0);
 			break;
+		}
 		default:
 			return DefWindowProc(hWndMain, uMsg, wParam, lParam);
 	}
